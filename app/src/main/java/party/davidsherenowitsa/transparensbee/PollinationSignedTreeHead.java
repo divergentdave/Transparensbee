@@ -9,6 +9,11 @@ public class PollinationSignedTreeHead extends SignedTreeHead {
         this.logID = logID;
     }
 
+    public PollinationSignedTreeHead(SignedTreeHead sth, byte[] logID)
+    {
+        this(sth.getVersion(), sth.getSignatureType(), sth.getTimestamp(), sth.getTreeSize(), sth.getRootHash(), logID);
+    }
+
     public byte[] getLogID()
     {
         return logID;
