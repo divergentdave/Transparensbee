@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId())
         {
             case R.id.runButton:
-                System.out.println("Hello world!");
+                PollinateIntentService.startActionFoo(this);
                 break;
         }
     }
