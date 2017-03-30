@@ -4,6 +4,14 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class PollinateIntentService extends IntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
 
@@ -37,7 +45,20 @@ public class PollinateIntentService extends IntentService {
      * Handle action Pollinate in the provided background thread.
      */
     private void handleActionPollinate() {
-        // TODO: Handle action Pollinate
-        System.out.println("Hello world!");
+        for (CertificateTransparencyLog log : CertificateTransparencyLog.CT_LOGS)
+        {
+            System.out.println(log.getHumanReadableName());
+            try {
+                log.getSTHSynchronous();
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
+        Collections.shuffle(auditors);
+        for (AuditorServer auditor : auditors)
+        {
+            System.out.println(auditor.getHumanReadableName());
+        }
     }
 }
