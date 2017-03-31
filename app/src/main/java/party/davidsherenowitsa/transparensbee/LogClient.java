@@ -8,8 +8,6 @@ import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.BlockingQueue;
@@ -50,15 +48,9 @@ public class LogClient {
         URL url = log.getGetSTHEndpoint();
         URLConnection conn = url.openConnection();
         InputStream is = conn.getInputStream();
-        Reader reader = new InputStreamReader(is, "UTF-8");
-        StringBuilder result = new StringBuilder();
-        char[] buf = new char[1024];
-        int read;
-        while ((read = reader.read(buf)) != -1)
-        {
-            result.append(buf, 0, read);
-        }
-        return parseSTH(result.toString());
+        SignedTreeHead sth = parseSTH(IOUtils.slurpInputStreamUTF8(is));
+        is.close();
+        return sth;
     }
 
     public static SignedTreeHead parseSTH(String input) throws JSONException
