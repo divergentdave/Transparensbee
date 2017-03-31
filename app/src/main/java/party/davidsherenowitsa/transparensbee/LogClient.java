@@ -33,7 +33,7 @@ public class LogClient {
         threadPoolExecutor = new ThreadPoolExecutor(0, 10, 1, TimeUnit.SECONDS, workQueue);
     }
 
-    public static FutureTask<SignedTreeHead> getSTH(final CertificateTransparencyLog log)
+    public static FutureTask<SignedTreeHead> getSTH(final LogServer log)
     {
         FutureTask<SignedTreeHead> futureTask = new FutureTask<>(new Callable<SignedTreeHead>() {
             @Override
@@ -45,7 +45,7 @@ public class LogClient {
         return futureTask;
     }
 
-    public static SignedTreeHead getSTHSynchronous(CertificateTransparencyLog log) throws IOException, JSONException
+    public static SignedTreeHead getSTHSynchronous(LogServer log) throws IOException, JSONException
     {
         URL url = log.getGetSTHEndpoint();
         URLConnection conn = url.openConnection();

@@ -42,17 +42,17 @@ public class PollinateIntentService extends IntentService {
      * Handle action Pollinate in the provided background thread.
      */
     private void handleActionPollinate() {
-        int n = CertificateTransparencyLog.CT_LOGS.length;
+        int n = LogServer.CT_LOGS.length;
         ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
         for (int i = 0; i < n; i++)
         {
-            CertificateTransparencyLog log = CertificateTransparencyLog.CT_LOGS[i];
+            LogServer log = LogServer.CT_LOGS[i];
             futures.add(LogClient.getSTH(log));
         }
         for (int i = 0; i < n; i++)
         {
             try {
-                CertificateTransparencyLog log = CertificateTransparencyLog.CT_LOGS[i];
+                LogServer log = LogServer.CT_LOGS[i];
                 SignedTreeHead sth = futures.get(i).get();
                 System.out.printf("%s: %s\n", log.getHumanReadableName(), Base64.encodeToString(sth.getRootHash(), Base64.NO_WRAP));
             } catch (InterruptedException | ExecutionException e) {

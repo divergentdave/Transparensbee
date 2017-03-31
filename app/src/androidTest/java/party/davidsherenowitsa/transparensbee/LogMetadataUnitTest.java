@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 public class LogMetadataUnitTest {
     @Test
     public void pilotLogIDCorrect() throws Exception {
-        assertEquals(Base64.encodeToString(CertificateTransparencyLog.PILOT.getLogID(), Base64.NO_WRAP),
+        assertEquals(Base64.encodeToString(LogServer.PILOT.getLogID(), Base64.NO_WRAP),
                 "pLkJkLQYWBSHuxOizGdwCjw1mAT5G9+443fNDsgN3BA=");
     }
 }
