@@ -5,7 +5,14 @@ import android.content.Intent;
 import android.content.Context;
 import android.util.Base64;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
@@ -56,6 +63,18 @@ public class PollinateIntentService extends IntentService {
                 SignedTreeHead sth = futures.get(i).get();
                 System.out.printf("%s: %s\n", log.getHumanReadableName(), Base64.encodeToString(sth.getRootHash(), Base64.NO_WRAP));
             } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
+        Collections.shuffle(auditors);
+        for (AuditorServer auditor : auditors)
+        {
+            try {
+                System.out.printf("%s %s\n",
+                        auditor.getHumanReadableName(),
+                        AuditorClient.pollinateSynchronous(auditor, new LinkedList<PollinationSignedTreeHead>()));
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
         }
