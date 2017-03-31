@@ -11,6 +11,8 @@ android:
     - sys-img-armeabi-v7a-android-22
     - extra
 before_script:
+  - mkdir -p /usr/local/android-sdk/licenses
+  - echo -n 8933bad161af4178b1185d1a37fbf41ea5269c55 > /usr/local/android-sdk/licenses/android-sdk-license
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
