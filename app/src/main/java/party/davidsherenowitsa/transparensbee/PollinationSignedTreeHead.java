@@ -3,15 +3,15 @@ package party.davidsherenowitsa.transparensbee;
 public class PollinationSignedTreeHead extends SignedTreeHead {
     private final byte[] logID;
 
-    public PollinationSignedTreeHead(int version, int signatureType, long timestamp, long treeSize, byte[] rootHash, byte[] logID)
+    public PollinationSignedTreeHead(long timestamp, long treeSize, byte[] rootHash, byte[] treeHeadSignature, byte[] logID)
     {
-        super(version, signatureType, timestamp, treeSize, rootHash);
+        super(timestamp, treeSize, rootHash, treeHeadSignature);
         this.logID = logID;
     }
 
     public PollinationSignedTreeHead(SignedTreeHead sth, byte[] logID)
     {
-        this(sth.getVersion(), sth.getSignatureType(), sth.getTimestamp(), sth.getTreeSize(), sth.getRootHash(), logID);
+        this(sth.getTimestamp(), sth.getTreeSize(), sth.getRootHash(), sth.getTreeHeadSignature(), logID);
     }
 
     public byte[] getLogID()

@@ -6,14 +6,16 @@ public class SignedTreeHead {
     private final long timestamp;
     private final long treeSize;
     private final byte[] rootHash;
+    private final byte[] treeHeadSignature;
 
-    public SignedTreeHead(int version, int signatureType, long timestamp, long treeSize, byte[] rootHash)
+    public SignedTreeHead(long timestamp, long treeSize, byte[] rootHash, byte[] treeHeadSignature)
     {
-        this.version = version;
-        this.signatureType = signatureType;
+        this.version = 0;
+        this.signatureType = 1;
         this.timestamp = timestamp;
         this.treeSize = treeSize;
         this.rootHash = rootHash;
+        this.treeHeadSignature = treeHeadSignature;
     }
 
     public int getVersion()
@@ -39,5 +41,10 @@ public class SignedTreeHead {
     public byte[] getRootHash()
     {
         return rootHash;
+    }
+
+    public byte[] getTreeHeadSignature()
+    {
+        return treeHeadSignature;
     }
 }

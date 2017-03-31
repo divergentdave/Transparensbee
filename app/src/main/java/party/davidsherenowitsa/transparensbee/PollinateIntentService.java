@@ -3,14 +3,11 @@ package party.davidsherenowitsa.transparensbee;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.util.Base64;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 public class PollinateIntentService extends IntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
@@ -45,20 +42,22 @@ public class PollinateIntentService extends IntentService {
      * Handle action Pollinate in the provided background thread.
      */
     private void handleActionPollinate() {
-        for (CertificateTransparencyLog log : CertificateTransparencyLog.CT_LOGS)
+        int n = CertificateTransparencyLog.CT_LOGS.length;
+        ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
+        for (int i = 0; i < n; i++)
         {
-            System.out.println(log.getHumanReadableName());
+            CertificateTransparencyLog log = CertificateTransparencyLog.CT_LOGS[i];
+            futures.add(LogClient.getSTH(log));
+        }
+        for (int i = 0; i < n; i++)
+        {
             try {
-                log.getSTHSynchronous();
-            } catch (IOException | JSONException e) {
+                CertificateTransparencyLog log = CertificateTransparencyLog.CT_LOGS[i];
+                SignedTreeHead sth = futures.get(i).get();
+                System.out.printf("%s: %s\n", log.getHumanReadableName(), Base64.encodeToString(sth.getRootHash(), Base64.NO_WRAP));
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-        }
-        List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
-        Collections.shuffle(auditors);
-        for (AuditorServer auditor : auditors)
-        {
-            System.out.println(auditor.getHumanReadableName());
         }
     }
 }

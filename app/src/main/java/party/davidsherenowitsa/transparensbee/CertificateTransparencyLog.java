@@ -3,6 +3,7 @@ package party.davidsherenowitsa.transparensbee;
 import android.util.Base64;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.IOException;
@@ -77,7 +78,11 @@ public class CertificateTransparencyLog {
             result.append(buf, 0, read);
         }
         JSONTokener tokener = new JSONTokener(result.toString());
-        System.out.println(tokener.nextValue());
-        return null;
+        JSONObject jsonSTH = (JSONObject)tokener.nextValue();
+        return new SignedTreeHead(
+                jsonSTH.getLong("tree_size"),
+                jsonSTH.getLong("timestamp"),
+                Base64.decode(jsonSTH.getString("sha256_root_hash"), Base64.DEFAULT),
+                Base64.decode(jsonSTH.getString("tree_head_signature"), Base64.DEFAULT));
     }
 }
