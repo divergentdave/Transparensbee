@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class AuditorClient {
@@ -22,7 +23,7 @@ public class AuditorClient {
     {
     }
 
-    public static List<PollinationSignedTreeHead> pollinateSynchronous(AuditorServer auditor, List<PollinationSignedTreeHead> sths) throws IOException, JSONException
+    public static List<PollinationSignedTreeHead> pollinateSynchronous(AuditorServer auditor, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException
     {
         URL url = auditor.getPollinationEndpoint();
         URLConnection conn = url.openConnection();
@@ -36,7 +37,7 @@ public class AuditorClient {
         return newSths;
     }
 
-    public static void serializeSTHList(OutputStream os, List<PollinationSignedTreeHead> sths) throws IOException, JSONException
+    public static void serializeSTHList(OutputStream os, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException
     {
         JSONObject top = new JSONObject();
         JSONArray array = new JSONArray();

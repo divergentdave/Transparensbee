@@ -1,5 +1,7 @@
 package party.davidsherenowitsa.transparensbee;
 
+import java.util.Arrays;
+
 public class PollinationSignedTreeHead extends SignedTreeHead {
     private final byte[] logID;
 
@@ -17,5 +19,20 @@ public class PollinationSignedTreeHead extends SignedTreeHead {
     public byte[] getLogID()
     {
         return logID;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof PollinationSignedTreeHead))
+        {
+            return false;
+        }
+        PollinationSignedTreeHead other = (PollinationSignedTreeHead)obj;
+        return Arrays.equals(logID, other.logID) && super.equals(obj);
     }
 }

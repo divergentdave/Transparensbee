@@ -1,5 +1,7 @@
 package party.davidsherenowitsa.transparensbee;
 
+import java.util.Arrays;
+
 public class SignedTreeHead {
     private final int version;
     private final int signatureType;
@@ -46,5 +48,23 @@ public class SignedTreeHead {
     public byte[] getTreeHeadSignature()
     {
         return treeHeadSignature;
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(rootHash);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SignedTreeHead))
+        {
+            return false;
+        }
+        SignedTreeHead other = (SignedTreeHead)obj;
+        return version == other.version && signatureType == other.signatureType &&
+                timestamp == other.timestamp && treeSize == other.treeSize &&
+                Arrays.equals(rootHash, other.rootHash) &&
+                Arrays.equals(treeHeadSignature, other.treeHeadSignature);
     }
 }

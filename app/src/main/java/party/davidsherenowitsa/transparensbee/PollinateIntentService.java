@@ -10,8 +10,8 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -49,6 +49,7 @@ public class PollinateIntentService extends IntentService {
      * Handle action Pollinate in the provided background thread.
      */
     private void handleActionPollinate() {
+        Pollen pollen = new InMemoryPollen();
         int n = LogServer.CT_LOGS.length;
         ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
         for (int i = 0; i < n; i++)
@@ -61,6 +62,7 @@ public class PollinateIntentService extends IntentService {
             try {
                 LogServer log = LogServer.CT_LOGS[i];
                 SignedTreeHead sth = futures.get(i).get();
+                pollen.addFromLog(log, sth);
                 System.out.printf("%s: %s\n", log.getHumanReadableName(), Base64.encodeToString(sth.getRootHash(), Base64.NO_WRAP));
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
@@ -71,9 +73,13 @@ public class PollinateIntentService extends IntentService {
         for (AuditorServer auditor : auditors)
         {
             try {
-                System.out.printf("%s %s\n",
+                Collection<PollinationSignedTreeHead> sthsIn, sthsOut;
+                sthsOut = pollen.getForAuditor(auditor);
+                sthsIn = AuditorClient.pollinateSynchronous(auditor, sthsOut);
+                System.out.printf("%s %s %s\n",
                         auditor.getHumanReadableName(),
-                        AuditorClient.pollinateSynchronous(auditor, new LinkedList<PollinationSignedTreeHead>()));
+                        sthsOut,
+                        sthsIn);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
