@@ -25,6 +25,15 @@
         <service
             android:name=".PollinateIntentService"
             android:exported="false" />
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
