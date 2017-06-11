@@ -11,6 +11,12 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private InMemoryStatistics statistics;
+
+    public MainActivity() {
+        super();
+        statistics = InMemoryStatistics.getInstance();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

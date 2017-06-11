@@ -19,8 +19,11 @@ import java.util.concurrent.FutureTask;
 public class PollinateIntentService extends IntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
 
+    private InMemoryStatistics statistics;
+
     public PollinateIntentService() {
         super("PollinateIntentService");
+        statistics = InMemoryStatistics.getInstance();
     }
 
     /**
@@ -59,13 +62,14 @@ public class PollinateIntentService extends IntentService {
         }
         for (int i = 0; i < n; i++)
         {
+            LogServer log = LogServer.CT_LOGS[i];
             try {
-                LogServer log = LogServer.CT_LOGS[i];
                 SignedTreeHead sth = futures.get(i).get();
                 pollen.addFromLog(log, sth);
-                System.out.printf("%s: %s\n", log.getHumanReadableName(), Base64.encodeToString(sth.getRootHash(), Base64.NO_WRAP));
+                statistics.addLogSuccess(log);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
+                statistics.addLogFailure(log);
             }
         }
         List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
@@ -80,8 +84,10 @@ public class PollinateIntentService extends IntentService {
                         auditor.getHumanReadableName(),
                         sthsOut,
                         sthsIn);
+                statistics.addAuditorSuccess(auditor);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
+                statistics.addAuditorFailure(auditor);
             }
         }
     }
