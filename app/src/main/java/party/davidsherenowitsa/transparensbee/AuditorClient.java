@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class AuditorClient {
+    public static final int CONNECT_TIMEOUT = 15000, READ_TIMEOUT = 60000;
     private AuditorClient()
     {
     }
@@ -27,6 +28,8 @@ public class AuditorClient {
     {
         URL url = auditor.getPollinationEndpoint();
         URLConnection conn = url.openConnection();
+        conn.setConnectTimeout(CONNECT_TIMEOUT);
+        conn.setReadTimeout(READ_TIMEOUT);
         conn.setDoOutput(true);
         OutputStream os = conn.getOutputStream();
         serializeSTHList(os, sths);

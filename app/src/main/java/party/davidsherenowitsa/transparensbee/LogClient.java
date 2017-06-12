@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class LogClient {
+    public static final int CONNECT_TIMEOUT = 15000, READ_TIMEOUT = 60000;
     private static LogClient singleton;
     static {
         singleton = new LogClient();
@@ -47,6 +48,8 @@ public class LogClient {
     {
         URL url = log.getGetSTHEndpoint();
         URLConnection conn = url.openConnection();
+        conn.setConnectTimeout(CONNECT_TIMEOUT);
+        conn.setReadTimeout(READ_TIMEOUT);
         InputStream is = conn.getInputStream();
         SignedTreeHead sth = parseSTH(IOUtils.slurpInputStreamUTF8(is));
         is.close();
