@@ -37,11 +37,7 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
             assert server != null;
             nameTextView.setText(server.getHumanReadableName());
             Pair<Integer, Integer> pair = null;
-            if (server instanceof AuditorServer) {
-                pair = statistics.getAuditorSuccessFailure((AuditorServer)server);
-            } else if (server instanceof LogServer) {
-                pair = statistics.getLogSuccessFailure((LogServer)server);
-            }
+            pair = statistics.getServerSuccessFailure(server);
             int success, failure;
             if (pair != null) {
                 success = pair.first;
@@ -57,17 +53,7 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
     }
 
     @Override
-    public void notifyLog(LogServer log) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                StatsArrayAdapter.super.notifyDataSetChanged();
-            }
-        });
-    }
-
-    @Override
-    public void notifyAuditor(AuditorServer auditor) {
+    public void notify(Server server) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryStatistics implements Statistics {
-    private HashMap<LogServer, Pair<Integer, Integer>> logStats;
-    private HashMap<AuditorServer, Pair<Integer, Integer>> auditorStats;
+    private HashMap<Server, Pair<Integer, Integer>> stats;
     private List<StatisticsListener> listenerList;
 
     private static InMemoryStatistics singleton;
@@ -21,75 +20,41 @@ public class InMemoryStatistics implements Statistics {
     }
 
     private InMemoryStatistics() {
-        logStats = new HashMap<>();
-        auditorStats = new HashMap<>();
+        stats = new HashMap<>();
         listenerList = new ArrayList<>();
     }
 
     @Override
-    public synchronized void addLogFailure(LogServer log) {
-        Pair<Integer, Integer> oldCounts = logStats.get(log);
+    public synchronized void addFailure(Server server) {
+        Pair<Integer, Integer> oldCounts = stats.get(server);
         if (oldCounts == null) {
-            logStats.put(log, new Pair<>(0, 1));
+            stats.put(server, new Pair<>(0, 1));
         } else {
-            logStats.put(log, new Pair<>(oldCounts.first, oldCounts.second + 1));
+            stats.put(server, new Pair<>(oldCounts.first, oldCounts.second + 1));
         }
         for (StatisticsListener listener : listenerList)
         {
-            listener.notifyLog(log);
+            listener.notify(server);
         }
     }
 
     @Override
-    public synchronized void addLogSuccess(LogServer log) {
-        Pair<Integer, Integer> oldCounts = logStats.get(log);
+    public synchronized void addSuccess(Server server) {
+        Pair<Integer, Integer> oldCounts = stats.get(server);
         if (oldCounts == null) {
-            logStats.put(log, new Pair<>(1, 0));
+            stats.put(server, new Pair<>(1, 0));
         } else {
-            logStats.put(log, new Pair<>(oldCounts.first + 1, oldCounts.second));
+            stats.put(server, new Pair<>(oldCounts.first + 1, oldCounts.second));
         }
         for (StatisticsListener listener : listenerList)
         {
-            listener.notifyLog(log);
+            listener.notify(server);
         }
     }
 
     @Override
-    public synchronized void addAuditorFailure(AuditorServer auditor) {
-        Pair<Integer, Integer> oldCounts = auditorStats.get(auditor);
-        if (oldCounts == null) {
-            auditorStats.put(auditor, new Pair<>(0, 1));
-        } else {
-            auditorStats.put(auditor, new Pair<>(oldCounts.first, oldCounts.second + 1));
-        }
-        for (StatisticsListener listener : listenerList)
-        {
-            listener.notifyAuditor(auditor);
-        }
-    }
-
-    @Override
-    public synchronized void addAuditorSuccess(AuditorServer auditor) {
-        Pair<Integer, Integer> oldCounts = auditorStats.get(auditor);
-        if (oldCounts == null) {
-            auditorStats.put(auditor, new Pair<>(1, 0));
-        } else {
-            auditorStats.put(auditor, new Pair<>(oldCounts.first + 1, oldCounts.second));
-        }
-        for (StatisticsListener listener : listenerList)
-        {
-            listener.notifyAuditor(auditor);
-        }
-    }
-
-    @Override
-    public Pair<Integer, Integer> getLogSuccessFailure(LogServer log) {
-        return logStats.get(log);
-    }
-
-    @Override
-    public Pair<Integer, Integer> getAuditorSuccessFailure(AuditorServer auditor) {
-        return auditorStats.get(auditor);
+    public Pair<Integer, Integer> getServerSuccessFailure(Server log) {
+        return stats.get(log);
     }
 
     @Override

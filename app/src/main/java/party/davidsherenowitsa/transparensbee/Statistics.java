@@ -3,17 +3,13 @@ package party.davidsherenowitsa.transparensbee;
 import android.util.Pair;
 
 public interface Statistics {
-    void addLogFailure(LogServer log);
-    void addLogSuccess(LogServer log);
-    void addAuditorFailure(AuditorServer auditor);
-    void addAuditorSuccess(AuditorServer auditor);
-    Pair<Integer, Integer> getLogSuccessFailure(LogServer log);
-    Pair<Integer, Integer> getAuditorSuccessFailure(AuditorServer auditor);
+    void addFailure(Server server);
+    void addSuccess(Server server);
+    Pair<Integer, Integer> getServerSuccessFailure(Server server);
     void registerListener(StatisticsListener listener);
     void unregisterListener(StatisticsListener listener);
 
     interface StatisticsListener {
-        void notifyLog(LogServer log);
-        void notifyAuditor(AuditorServer auditor);
+        void notify(Server server);
     }
 }

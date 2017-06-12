@@ -65,10 +65,10 @@ public class PollinateIntentService extends IntentService {
             try {
                 SignedTreeHead sth = futures.get(i).get();
                 pollen.addFromLog(log, sth);
-                statistics.addLogSuccess(log);
+                statistics.addSuccess(log);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-                statistics.addLogFailure(log);
+                statistics.addFailure(log);
             }
         }
         List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
@@ -83,10 +83,10 @@ public class PollinateIntentService extends IntentService {
                         auditor.getHumanReadableName(),
                         sthsOut,
                         sthsIn);
-                statistics.addAuditorSuccess(auditor);
+                statistics.addSuccess(auditor);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
-                statistics.addAuditorFailure(auditor);
+                statistics.addFailure(auditor);
             }
         }
     }
