@@ -1,7 +1,9 @@
 package party.davidsherenowitsa.transparensbee;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,40 +11,68 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistics.StatisticsListener {
-    private Context context;
+    private Activity activity;
     private int viewId;
+    private Statistics statistics;
 
-    public StatsArrayAdapter(Context context, int id, Server[] array) {
-        super(context, id, array);
-        this.context = context;
+    public StatsArrayAdapter(Activity activity, int id, Server[] array, Statistics statistics) {
+        super(activity, id, array);
+        this.activity = activity;
         this.viewId = id;
+        this.statistics = statistics;
     }
 
-    @Override @NonNull
+    @Override
+    @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null || convertView.getId() != viewId) {
-            LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(viewId, parent, false);
         }
-        TextView textView = convertView.findViewById(R.id.listItemTextView);
-        if (textView != null) {
+        TextView nameTextView = convertView.findViewById(R.id.listItemName),
+                successTextView = convertView.findViewById(R.id.listItemSuccess),
+                failureTextView = convertView.findViewById(R.id.listItemFailure);
+        if (nameTextView != null && successTextView != null && failureTextView != null) {
             Server server = getItem(position);
-            if (server != null) {
-                textView.setText(server.getHumanReadableName());
-            } else {
-                textView.setText("");
+            assert server != null;
+            nameTextView.setText(server.getHumanReadableName());
+            Pair<Integer, Integer> pair = null;
+            if (server instanceof AuditorServer) {
+                pair = statistics.getAuditorSuccessFailure((AuditorServer)server);
+            } else if (server instanceof LogServer) {
+                pair = statistics.getLogSuccessFailure((LogServer)server);
             }
+            int success, failure;
+            if (pair != null) {
+                success = pair.first;
+                failure = pair.second;
+            } else {
+                success = 0;
+                failure = 0;
+            }
+            successTextView.setText(activity.getString(R.string.list_item_success, success));
+            failureTextView.setText(activity.getString(R.string.list_item_failure, failure));
         }
         return convertView;
     }
 
     @Override
     public void notifyLog(LogServer log) {
-        super.notifyDataSetChanged();
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                StatsArrayAdapter.super.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void notifyAuditor(AuditorServer auditor) {
-        super.notifyDataSetChanged();
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                StatsArrayAdapter.super.notifyDataSetChanged();
+            }
+        });
     }
 }

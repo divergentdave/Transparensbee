@@ -3,4 +3,6 @@
     <string name="run">Run</string>
     <string name="log_server_status">Log server status</string>
     <string name="auditor_server_status">Auditor server status</string>
+    <string name="list_item_success">Success: %d</string>
+    <string name="list_item_failure">Failure: %d</string>
 </resources>

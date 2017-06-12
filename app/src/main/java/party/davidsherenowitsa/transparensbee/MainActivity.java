@@ -28,12 +28,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button runButton = (Button)findViewById(R.id.runButton);
         if (runButton != null) runButton.setOnClickListener(this);
 
-        logAdapter = new StatsArrayAdapter(this, R.layout.log_list_item, LogServer.CT_LOGS);
+        logAdapter = new StatsArrayAdapter(this, R.layout.log_list_item, LogServer.CT_LOGS, statistics);
         ListView logListView = (ListView)findViewById(R.id.logListView);
         if (logListView != null) logListView.setAdapter(logAdapter);
         statistics.registerListener(logAdapter);
 
-        auditorAdapter = new StatsArrayAdapter(this, R.layout.auditor_list_item, AuditorServer.AUDITORS);
+        auditorAdapter = new StatsArrayAdapter(this, R.layout.auditor_list_item, AuditorServer.AUDITORS, statistics);
         ListView auditorListView = (ListView)findViewById(R.id.auditorListView);
         if (auditorListView != null) auditorListView.setAdapter(auditorAdapter);
         statistics.registerListener(auditorAdapter);
