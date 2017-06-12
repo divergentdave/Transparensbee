@@ -36,8 +36,7 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
             Server server = getItem(position);
             assert server != null;
             nameTextView.setText(server.getHumanReadableName());
-            Pair<Integer, Integer> pair = null;
-            pair = statistics.getServerSuccessFailure(server);
+            Pair<Integer, Integer> pair = statistics.getServerSuccessFailure(server);
             int success, failure;
             if (pair != null) {
                 success = pair.first;
