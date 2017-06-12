@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <domain-config>
-        <domain includeSubdomains="true">ct.grahamedgecombe.com</domain>
-        <pin-set expiration="2017-06-13">
-            <pin digest="SHA-256">JgsfHZPAOW2WPM4/hyZEfyozJWGUd8EKfTfuO51tyTk=</pin>
-            <pin digest="SHA-256">K4GUUPiNpr3HphtlHVXwcJ/0e3mCG8REvCFIKsVmAT8=</pin>
-            <pin digest="SHA-256">5bIDzuaPpsnBUyI0y02tKzUUTg+aRhBPsjoGnksK0nI=</pin>
-            <pin digest="SHA-256">7ee8jrUN0s8XFvIfGq+90Zg/76v9vUWFTHYeeVldt+8=</pin>
-            <pin digest="SHA-256">culrj4H8J1foar4saQWUD5TjPk8HihAxpO/maA9uqZU=</pin>
-            <pin digest="SHA-256">287zGo/tCnBFamKDRvwOKFEu8+clWFHjL4DfPEEWRZs=</pin>
-        </pin-set>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">com</domain>
+        <domain includeSubdomains="true">cn</domain>
+        <domain includeSubdomains="true">eus</domain>
+        <domain includeSubdomains="true">org</domain>
+        <domain includeSubdomains="true">io</domain>
+        <domain-config>
+            <domain includeSubdomains="true">ct.grahamedgecombe.com</domain>
+            <pin-set expiration="2017-06-13">
+                <pin digest="SHA-256">JgsfHZPAOW2WPM4/hyZEfyozJWGUd8EKfTfuO51tyTk=</pin>
+                <pin digest="SHA-256">K4GUUPiNpr3HphtlHVXwcJ/0e3mCG8REvCFIKsVmAT8=</pin>
+                <pin digest="SHA-256">5bIDzuaPpsnBUyI0y02tKzUUTg+aRhBPsjoGnksK0nI=</pin>
+                <pin digest="SHA-256">7ee8jrUN0s8XFvIfGq+90Zg/76v9vUWFTHYeeVldt+8=</pin>
+                <pin digest="SHA-256">culrj4H8J1foar4saQWUD5TjPk8HihAxpO/maA9uqZU=</pin>
+                <pin digest="SHA-256">287zGo/tCnBFamKDRvwOKFEu8+clWFHjL4DfPEEWRZs=</pin>
+            </pin-set>
+        </domain-config>
     </domain-config>
 </network-security-config>
