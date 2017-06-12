@@ -3,7 +3,6 @@ package party.davidsherenowitsa.transparensbee;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.util.Base64;
 
 import org.json.JSONException;
 

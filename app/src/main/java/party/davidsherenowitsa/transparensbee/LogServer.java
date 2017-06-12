@@ -5,7 +5,7 @@ import android.util.Base64;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class LogServer {
+public class LogServer extends Server {
     public static final LogServer PILOT = new LogServer(
             "ct.googleapis.com/pilot",
             Base64.decode("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEfahLEimAoz2t01p3uMziiLOl/fHTDM0YDOhBRuiBARsV4UvxG2LdNgoIGLrtCzWE0J5APC2em4JlvR8EEEFMoA==",
@@ -21,13 +21,12 @@ public class LogServer {
     private String serverPrefix;
     private byte[] publicKey;
     private byte[] logID;
-    private String humanReadableName;
 
     public LogServer(String serverPrefix, byte[] publicKey, String humanReadableName)
     {
+        super(humanReadableName);
         this.serverPrefix = serverPrefix;
         this.publicKey = publicKey;
-        this.humanReadableName = humanReadableName;
         logID = CryptoUtils.SHA256NoThrow(publicKey);
     }
 
@@ -44,11 +43,6 @@ public class LogServer {
     public byte[] getLogID()
     {
         return logID;
-    }
-
-    public String getHumanReadableName()
-    {
-        return humanReadableName;
     }
 
     public URL getGetSTHEndpoint() throws MalformedURLException
