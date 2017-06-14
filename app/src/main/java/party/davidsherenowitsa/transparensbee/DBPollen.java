@@ -167,7 +167,7 @@ public class DBPollen implements Pollen {
                         " FROM " + STH.TABLE_NAME +
                         " WHERE " + STH._ID +
                         " IN (SELECT " + STH._ID + " FROM (SELECT " + STH._ID + "," +
-                        " (SELECT COUNT(*) FROM " + STHSeen.TABLE_NAME +
+                        " (SELECT MIN(1,COUNT(*)) FROM " + STHSeen.TABLE_NAME +
                         " WHERE " + STHSeen.COLUMN_NAME_AUDITOR_ID +
                         " = ?) AS seen " +
                         " FROM " + STH.TABLE_NAME +
