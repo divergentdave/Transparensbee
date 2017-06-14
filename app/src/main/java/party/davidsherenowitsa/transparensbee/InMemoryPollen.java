@@ -3,7 +3,6 @@ package party.davidsherenowitsa.transparensbee;
 import java.util.HashSet;
 import java.util.Collection;
 
-// TODO: Replace with a SQLite-backed durable store
 public class InMemoryPollen implements Pollen {
     private HashSet<PollinationSignedTreeHead> set;
 

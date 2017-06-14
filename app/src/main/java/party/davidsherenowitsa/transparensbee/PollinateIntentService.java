@@ -51,43 +51,45 @@ public class PollinateIntentService extends IntentService {
      * Handle action Pollinate in the provided background thread.
      */
     private void handleActionPollinate() {
-        Pollen pollen = new InMemoryPollen();
-        int n = LogServer.CT_LOGS.length;
-        ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
-        for (int i = 0; i < n; i++)
-        {
-            LogServer log = LogServer.CT_LOGS[i];
-            futures.add(LogClient.getSTH(log));
-        }
-        for (int i = 0; i < n; i++)
-        {
-            LogServer log = LogServer.CT_LOGS[i];
-            try {
-                SignedTreeHead sth = futures.get(i).get();
-                pollen.addFromLog(log, sth);
-                statistics.addSuccess(log);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                statistics.addFailure(log);
+        DBPollen pollen = new DBPollen(this);
+        try {
+            int n = LogServer.CT_LOGS.length;
+            ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) {
+                LogServer log = LogServer.CT_LOGS[i];
+                futures.add(LogClient.getSTH(log));
             }
-        }
-        List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
-        Collections.shuffle(auditors);
-        for (AuditorServer auditor : auditors)
-        {
-            try {
-                Collection<PollinationSignedTreeHead> sthsIn, sthsOut;
-                sthsOut = pollen.getForAuditor(auditor);
-                sthsIn = AuditorClient.pollinateSynchronous(auditor, sthsOut);
-                System.out.printf("%s %s %s\n",
-                        auditor.getHumanReadableName(),
-                        sthsOut,
-                        sthsIn);
-                statistics.addSuccess(auditor);
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-                statistics.addFailure(auditor);
+            for (int i = 0; i < n; i++) {
+                LogServer log = LogServer.CT_LOGS[i];
+                try {
+                    SignedTreeHead sth = futures.get(i).get();
+                    pollen.addFromLog(log, sth);
+                    statistics.addSuccess(log);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    statistics.addFailure(log);
+                }
             }
+            List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
+            Collections.shuffle(auditors);
+            for (AuditorServer auditor : auditors) {
+                try {
+                    Collection<PollinationSignedTreeHead> sthsIn, sthsOut;
+                    sthsOut = pollen.getForAuditor(auditor);
+                    sthsIn = AuditorClient.pollinateSynchronous(auditor, sthsOut);
+                    System.out.printf("%s %s %s\n",
+                            auditor.getHumanReadableName(),
+                            sthsOut,
+                            sthsIn);
+                    statistics.addSuccess(auditor);
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    statistics.addFailure(auditor);
+                }
+            }
+            pollen.cleanup();
+        } finally {
+            pollen.close();
         }
     }
 }
