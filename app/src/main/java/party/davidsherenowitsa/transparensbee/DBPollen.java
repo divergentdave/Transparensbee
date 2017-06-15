@@ -125,20 +125,24 @@ public class DBPollen implements Pollen {
         seenValues.put(STHSeen.COLUMN_NAME_AUDITOR_ID, auditorId);
         for (PollinationSignedTreeHead sth : sths) {
             long sthId;
-            Long lookupResult = lookupSth(sth);
-            if (lookupResult != null) {
-                sthId = lookupResult;
+            if (sth instanceof PollinationSignedTreeHeadWithId) {
+                sthId = ((PollinationSignedTreeHeadWithId)sth).getDatabaseId();
             } else {
-                sthValues.put(STH.COLUMN_NAME_VERSION, sth.getVersion());
-                sthValues.put(STH.COLUMN_NAME_SIGNATURE_TYPE, sth.getSignatureType());
-                sthValues.put(STH.COLUMN_NAME_TIMESTAMP, sth.getTimestamp());
-                sthValues.put(STH.COLUMN_NAME_TREE_SIZE, sth.getTreeSize());
-                sthValues.put(STH.COLUMN_NAME_ROOT_HASH, sth.getRootHash());
-                sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE, sth.getTreeHeadSignature());
-                String hex = Base64.encodeToString(sth.getTreeHeadSignature(), Base64.NO_WRAP);
-                sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE_HEX, hex);
-                sthValues.put(STH.COLUMN_NAME_LOG_ID, sth.getLogID());
-                sthId = db.insert(STH.TABLE_NAME, null, sthValues);
+                Long lookupResult = lookupSth(sth);
+                if (lookupResult != null) {
+                    sthId = lookupResult;
+                } else {
+                    sthValues.put(STH.COLUMN_NAME_VERSION, sth.getVersion());
+                    sthValues.put(STH.COLUMN_NAME_SIGNATURE_TYPE, sth.getSignatureType());
+                    sthValues.put(STH.COLUMN_NAME_TIMESTAMP, sth.getTimestamp());
+                    sthValues.put(STH.COLUMN_NAME_TREE_SIZE, sth.getTreeSize());
+                    sthValues.put(STH.COLUMN_NAME_ROOT_HASH, sth.getRootHash());
+                    sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE, sth.getTreeHeadSignature());
+                    String hex = Base64.encodeToString(sth.getTreeHeadSignature(), Base64.NO_WRAP);
+                    sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE_HEX, hex);
+                    sthValues.put(STH.COLUMN_NAME_LOG_ID, sth.getLogID());
+                    sthId = db.insert(STH.TABLE_NAME, null, sthValues);
+                }
             }
             seenValues.put(STHSeen.COLUMN_NAME_STH_ID, sthId);
             db.insertWithOnConflict(STHSeen.TABLE_NAME, null, seenValues, SQLiteDatabase.CONFLICT_IGNORE);

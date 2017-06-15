@@ -79,8 +79,10 @@ public class PollinateIntentService extends IntentService {
                     sthsIn = AuditorClient.pollinateSynchronous(auditor, sthsOut);
                     System.out.printf("%s %s %s\n",
                             auditor.getHumanReadableName(),
-                            sthsOut,
-                            sthsIn);
+                            sthsOut.size(),
+                            sthsIn.size());
+                    pollen.addFromAuditor(auditor, sthsIn); // New STHs received from auditor
+                    pollen.addFromAuditor(auditor, sthsOut); // STHs we just sent, mark as seen
                     statistics.addSuccess(auditor);
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
