@@ -126,7 +126,7 @@ public class DBPollen implements Pollen {
         for (PollinationSignedTreeHead sth : sths) {
             long sthId;
             if (sth instanceof PollinationSignedTreeHeadWithId) {
-                sthId = ((PollinationSignedTreeHeadWithId)sth).getDatabaseId();
+                sthId = ((PollinationSignedTreeHeadWithId) sth).getDatabaseId();
             } else {
                 Long lookupResult = lookupSth(sth);
                 if (lookupResult != null) {
