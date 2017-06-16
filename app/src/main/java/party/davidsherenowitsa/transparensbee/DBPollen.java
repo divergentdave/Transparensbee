@@ -237,7 +237,7 @@ public class DBPollen implements Pollen {
                         cursorFiller.getLong(idIndex)
                 ));
             }
-            cursorNew.close();
+            cursorFiller.close();
         }
 
         return list;
