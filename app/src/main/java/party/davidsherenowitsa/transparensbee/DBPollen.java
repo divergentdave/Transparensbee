@@ -177,14 +177,20 @@ public class DBPollen implements Pollen {
                         " FROM " + STH.TABLE_NAME +
                         " ORDER BY seen ASC, RANDOM() LIMIT ?))"
                 , new String[]{Long.toString(auditorId), Integer.toString(TARGET_COUNT)});
+        int timestampIndex = cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_TIMESTAMP);
+        int treeSizeIndex = cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_TREE_SIZE);
+        int rootHashIndex = cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_ROOT_HASH);
+        int signatureIndex = cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE);
+        int logIdIndex = cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_LOG_ID);
+        int idIndex = cursor.getColumnIndexOrThrow(STH._ID);
         while (cursor.moveToNext()) {
             list.add(new PollinationSignedTreeHeadWithId(
-                    cursor.getLong(cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_TIMESTAMP)),
-                    cursor.getLong(cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_TREE_SIZE)),
-                    cursor.getBlob(cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_ROOT_HASH)),
-                    cursor.getBlob(cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE)),
-                    cursor.getBlob(cursor.getColumnIndexOrThrow(STH.COLUMN_NAME_LOG_ID)),
-                    cursor.getLong(cursor.getColumnIndexOrThrow(STH._ID))
+                    cursor.getLong(timestampIndex),
+                    cursor.getLong(treeSizeIndex),
+                    cursor.getBlob(rootHashIndex),
+                    cursor.getBlob(signatureIndex),
+                    cursor.getBlob(logIdIndex),
+                    cursor.getLong(idIndex)
             ));
         }
         cursor.close();
