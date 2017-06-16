@@ -16,6 +16,8 @@ public class DBPollen implements Pollen {
     private CTDBHelper dbHelper;
     private SQLiteDatabase db;
 
+    private static final int TWO_WEEKS = 1000 * 3600 * 24 * 14;
+
     public DBPollen(Context context) {
         dbHelper = new CTDBHelper(context);
         db = null;
@@ -100,6 +102,9 @@ public class DBPollen implements Pollen {
         if (lookupSth(sth) != null) {
             return;
         }
+        if (sth.getTimestamp() < System.currentTimeMillis() - TWO_WEEKS) {
+            return;
+        }
         ContentValues values = new ContentValues();
         values.put(STH.COLUMN_NAME_VERSION, sth.getVersion());
         values.put(STH.COLUMN_NAME_SIGNATURE_TYPE, sth.getSignatureType());
@@ -119,33 +124,36 @@ public class DBPollen implements Pollen {
             open();
         }
 
+        long timestampCutoff = System.currentTimeMillis() - TWO_WEEKS;
         long auditorId = lookupOrAddAuditor(auditor);
         ContentValues sthValues = new ContentValues();
         ContentValues seenValues = new ContentValues();
         seenValues.put(STHSeen.COLUMN_NAME_AUDITOR_ID, auditorId);
         for (PollinationSignedTreeHead sth : sths) {
-            long sthId;
-            if (sth instanceof PollinationSignedTreeHeadWithId) {
-                sthId = ((PollinationSignedTreeHeadWithId) sth).getDatabaseId();
-            } else {
-                Long lookupResult = lookupSth(sth);
-                if (lookupResult != null) {
-                    sthId = lookupResult;
+            if (sth.getTimestamp() > timestampCutoff) {
+                long sthId;
+                if (sth instanceof PollinationSignedTreeHeadWithId) {
+                    sthId = ((PollinationSignedTreeHeadWithId) sth).getDatabaseId();
                 } else {
-                    sthValues.put(STH.COLUMN_NAME_VERSION, sth.getVersion());
-                    sthValues.put(STH.COLUMN_NAME_SIGNATURE_TYPE, sth.getSignatureType());
-                    sthValues.put(STH.COLUMN_NAME_TIMESTAMP, sth.getTimestamp());
-                    sthValues.put(STH.COLUMN_NAME_TREE_SIZE, sth.getTreeSize());
-                    sthValues.put(STH.COLUMN_NAME_ROOT_HASH, sth.getRootHash());
-                    sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE, sth.getTreeHeadSignature());
-                    String hex = Base64.encodeToString(sth.getTreeHeadSignature(), Base64.NO_WRAP);
-                    sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE_HEX, hex);
-                    sthValues.put(STH.COLUMN_NAME_LOG_ID, sth.getLogID());
-                    sthId = db.insert(STH.TABLE_NAME, null, sthValues);
+                    Long lookupResult = lookupSth(sth);
+                    if (lookupResult != null) {
+                        sthId = lookupResult;
+                    } else {
+                        sthValues.put(STH.COLUMN_NAME_VERSION, sth.getVersion());
+                        sthValues.put(STH.COLUMN_NAME_SIGNATURE_TYPE, sth.getSignatureType());
+                        sthValues.put(STH.COLUMN_NAME_TIMESTAMP, sth.getTimestamp());
+                        sthValues.put(STH.COLUMN_NAME_TREE_SIZE, sth.getTreeSize());
+                        sthValues.put(STH.COLUMN_NAME_ROOT_HASH, sth.getRootHash());
+                        sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE, sth.getTreeHeadSignature());
+                        String hex = Base64.encodeToString(sth.getTreeHeadSignature(), Base64.NO_WRAP);
+                        sthValues.put(STH.COLUMN_NAME_TREE_HEAD_SIGNATURE_HEX, hex);
+                        sthValues.put(STH.COLUMN_NAME_LOG_ID, sth.getLogID());
+                        sthId = db.insert(STH.TABLE_NAME, null, sthValues);
+                    }
                 }
+                seenValues.put(STHSeen.COLUMN_NAME_STH_ID, sthId);
+                db.insertWithOnConflict(STHSeen.TABLE_NAME, null, seenValues, SQLiteDatabase.CONFLICT_IGNORE);
             }
-            seenValues.put(STHSeen.COLUMN_NAME_STH_ID, sthId);
-            db.insertWithOnConflict(STHSeen.TABLE_NAME, null, seenValues, SQLiteDatabase.CONFLICT_IGNORE);
         }
     }
 
