@@ -4,11 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static party.davidsherenowitsa.transparensbee.CTDBContract.*;
 
@@ -244,7 +246,34 @@ public class DBPollen implements Pollen {
     }
 
     public void cleanup() {
-        // TODO
+        List<Long> ids = new ArrayList<>();
+        long timestampCutoff = System.currentTimeMillis() - TWO_WEEKS;
+        String[] projection = {STH._ID};
+        Cursor cursor = db.query(
+                STH.TABLE_NAME,
+                projection,
+                CTDBContract.STH.COLUMN_NAME_TIMESTAMP + " < ?",
+                new String[]{Long.toString(timestampCutoff)},
+                null,
+                null,
+                null);
+        int idIndex = cursor.getColumnIndexOrThrow(STH._ID);
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(idIndex);
+            ids.add(id);
+        }
+        cursor.close();
+
+        SQLiteStatement deleteSeenStmt = db.compileStatement("DELETE FROM " + STHSeen.TABLE_NAME + " WHERE " + STHSeen.COLUMN_NAME_STH_ID + "=?");
+        SQLiteStatement deleteSthStmt = db.compileStatement("DELETE FROM " + STH.TABLE_NAME + " WHERE " + STH._ID + "=?");
+        for (long id : ids) {
+            deleteSeenStmt.bindLong(1, id);
+            deleteSeenStmt.executeUpdateDelete();
+            deleteSthStmt.bindLong(1, id);
+            deleteSthStmt.executeUpdateDelete();
+        }
+        deleteSeenStmt.close();
+        deleteSthStmt.close();
     }
 
     private class PollinationSignedTreeHeadWithId extends PollinationSignedTreeHead {
