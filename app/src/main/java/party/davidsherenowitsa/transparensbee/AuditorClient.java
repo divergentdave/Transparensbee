@@ -20,14 +20,16 @@ import java.util.List;
 
 public class AuditorClient {
     public static final int CONNECT_TIMEOUT = 15000, READ_TIMEOUT = 60000;
-    private AuditorClient()
-    {
+    private final String userAgent;
+
+    public AuditorClient(String userAgent) {
+        this.userAgent = userAgent;
     }
 
-    public static List<PollinationSignedTreeHead> pollinateSynchronous(AuditorServer auditor, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException
-    {
+    public List<PollinationSignedTreeHead> pollinateSynchronous(AuditorServer auditor, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException {
         URL url = auditor.getPollinationEndpoint();
         URLConnection conn = url.openConnection();
+        conn.setRequestProperty("User-Agent", userAgent);
         conn.setConnectTimeout(CONNECT_TIMEOUT);
         conn.setReadTimeout(READ_TIMEOUT);
         conn.setDoOutput(true);
@@ -40,12 +42,10 @@ public class AuditorClient {
         return newSths;
     }
 
-    public static void serializeSTHList(OutputStream os, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException
-    {
+    public void serializeSTHList(OutputStream os, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException {
         JSONObject top = new JSONObject();
         JSONArray array = new JSONArray();
-        for (PollinationSignedTreeHead sth : sths)
-        {
+        for (PollinationSignedTreeHead sth : sths) {
             JSONObject obj = new JSONObject();
             obj.put("sth_version", sth.getVersion());
             obj.put("tree_size", sth.getTreeSize());
@@ -62,18 +62,15 @@ public class AuditorClient {
         writer.flush();
     }
 
-    public static List<PollinationSignedTreeHead> parseSTHList(InputStream is) throws IOException, JSONException
-    {
+    public List<PollinationSignedTreeHead> parseSTHList(InputStream is) throws IOException, JSONException {
         String string = IOUtils.slurpInputStreamUTF8(is);
         JSONTokener tokener = new JSONTokener(string);
-        JSONObject json = (JSONObject)tokener.nextValue();
+        JSONObject json = (JSONObject) tokener.nextValue();
         JSONArray array = json.getJSONArray("sths");
         List<PollinationSignedTreeHead> list = new ArrayList<>(array.length());
-        for (int i = 0; i < array.length(); i++)
-        {
+        for (int i = 0; i < array.length(); i++) {
             JSONObject sth = array.getJSONObject(i);
-            if (sth.getLong("sth_version") != 0)
-            {
+            if (sth.getLong("sth_version") != 0) {
                 throw new RuntimeException("Unsupported STH version");  // TODO
             }
             list.add(new PollinationSignedTreeHead(

@@ -1,8 +1,8 @@
 package party.davidsherenowitsa.transparensbee;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
 import org.json.JSONException;
 
@@ -12,11 +12,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class PollinateIntentService extends IntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
+    private static final String USER_AGENT = "Transparensbee (https://github.com/divergentdave/Transparensbee)";
 
     private InMemoryStatistics statistics;
 
@@ -53,11 +58,17 @@ public class PollinateIntentService extends IntentService {
     private void handleActionPollinate() {
         DBPollen pollen = new DBPollen(this);
         try {
+            BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+            ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(0, 10, 1, TimeUnit.SECONDS, workQueue);
+            LogClient logClient = new LogClient(USER_AGENT);
+
             int n = LogServer.CT_LOGS.length;
             ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
             for (int i = 0; i < n; i++) {
                 LogServer log = LogServer.CT_LOGS[i];
-                futures.add(LogClient.getSTH(log));
+                FutureTask<SignedTreeHead> future = logClient.getSTH(log);
+                futures.add(future);
+                threadPoolExecutor.execute(future);
             }
             for (int i = 0; i < n; i++) {
                 LogServer log = LogServer.CT_LOGS[i];
@@ -70,13 +81,15 @@ public class PollinateIntentService extends IntentService {
                     statistics.addFailure(log);
                 }
             }
+
+            AuditorClient auditorClient = new AuditorClient(USER_AGENT);
             List<AuditorServer> auditors = new ArrayList<>(Arrays.asList(AuditorServer.AUDITORS));
             Collections.shuffle(auditors);
             for (AuditorServer auditor : auditors) {
                 try {
                     Collection<PollinationSignedTreeHead> sthsIn, sthsOut;
                     sthsOut = pollen.getForAuditor(auditor);
-                    sthsIn = AuditorClient.pollinateSynchronous(auditor, sthsOut);
+                    sthsIn = auditorClient.pollinateSynchronous(auditor, sthsOut);
                     System.out.printf("%s %s %s\n",
                             auditor.getHumanReadableName(),
                             sthsOut.size(),
