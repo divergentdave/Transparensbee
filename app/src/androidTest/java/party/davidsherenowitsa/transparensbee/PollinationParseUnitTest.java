@@ -29,7 +29,8 @@ public class PollinationParseUnitTest {
     @Test
     public void parsePollinateResponse() throws Exception
     {
-        List<PollinationSignedTreeHead> list = AuditorClient.parseSTHList(new ByteArrayInputStream(FIXTURE.getBytes(Charset.forName("UTF-8"))));
+        AuditorClient auditorClient = new AuditorClient(null);
+        List<PollinationSignedTreeHead> list = auditorClient.parseSTHList(new ByteArrayInputStream(FIXTURE.getBytes(Charset.forName("UTF-8"))));
         assertEquals(1, list.size());
         assertEquals("b1N2rDHwMRnYmQCkURX/dxUcEdkCwQApBo2yCJo32RM=", Base64.encodeToString(list.get(0).getLogID(), Base64.NO_WRAP));
         assertEquals(0, list.get(0).getVersion());
@@ -42,9 +43,10 @@ public class PollinationParseUnitTest {
     @Test
     public void roundTripPollinate() throws Exception
     {
-        List<PollinationSignedTreeHead> list = AuditorClient.parseSTHList(new ByteArrayInputStream(FIXTURE.getBytes(Charset.forName("UTF-8"))));
+        AuditorClient auditorClient = new AuditorClient(null);
+        List<PollinationSignedTreeHead> list = auditorClient.parseSTHList(new ByteArrayInputStream(FIXTURE.getBytes(Charset.forName("UTF-8"))));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        AuditorClient.serializeSTHList(os, list);
+        auditorClient.serializeSTHList(os, list);
         assertEquals(FIXTURE, os.toString("UTF-8"));
     }
 }
