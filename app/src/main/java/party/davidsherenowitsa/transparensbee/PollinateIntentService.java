@@ -70,6 +70,7 @@ public class PollinateIntentService extends IntentService {
                 futures.add(future);
                 threadPoolExecutor.execute(future);
             }
+            threadPoolExecutor.shutdown();
             for (int i = 0; i < n; i++) {
                 LogServer log = LogServer.CT_LOGS[i];
                 try {
