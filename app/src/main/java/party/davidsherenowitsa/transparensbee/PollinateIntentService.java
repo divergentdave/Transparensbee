@@ -3,18 +3,23 @@ package party.davidsherenowitsa.transparensbee;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Pair;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -60,26 +65,43 @@ public class PollinateIntentService extends IntentService {
         try {
             BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
             ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(0, 10, 1, TimeUnit.SECONDS, workQueue);
-            LogClient logClient = new LogClient(USER_AGENT);
+            CompletionService<Pair<LogServer, SignedTreeHead>> executorCompletionService = new ExecutorCompletionService<>(threadPoolExecutor);
+            final LogClient logClient = new LogClient(USER_AGENT);
 
-            int n = LogServer.CT_LOGS.length;
-            ArrayList<FutureTask<SignedTreeHead>> futures = new ArrayList<>(n);
-            for (int i = 0; i < n; i++) {
-                LogServer log = LogServer.CT_LOGS[i];
-                FutureTask<SignedTreeHead> future = logClient.getSTH(log);
-                futures.add(future);
-                threadPoolExecutor.execute(future);
+            for (final LogServer log : LogServer.CT_LOGS) {
+                executorCompletionService.submit(new Callable<Pair<LogServer, SignedTreeHead>>() {
+                    @Override
+                    public Pair<LogServer, SignedTreeHead> call() throws Exception {
+                        try {
+                            return new Pair<>(log, logClient.getSTHSynchronous(log));
+                        } catch (SocketTimeoutException e) {
+                            statistics.addFailure(log);
+                            return null;
+                        } catch (UnknownHostException e) {
+                            statistics.addFailure(log);
+                            return null;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            statistics.addFailure(log);
+                            return null;
+                        }
+                    }
+                });
             }
             threadPoolExecutor.shutdown();
-            for (int i = 0; i < n; i++) {
-                LogServer log = LogServer.CT_LOGS[i];
+
+            //noinspection ForLoopReplaceableByForEach
+            for (int i = 0; i < LogServer.CT_LOGS.length; i++) {
                 try {
-                    SignedTreeHead sth = futures.get(i).get();
-                    pollen.addFromLog(log, sth);
-                    statistics.addSuccess(log);
-                } catch (InterruptedException | ExecutionException e) {
+                    Pair<LogServer, SignedTreeHead> results = executorCompletionService.take().get();
+                    if (results != null) {
+                        LogServer log = results.first;
+                        SignedTreeHead sth = results.second;
+                        pollen.addFromLog(log, sth);
+                        statistics.addSuccess(log);
+                    }
+                } catch (ExecutionException e) {
                     e.printStackTrace();
-                    statistics.addFailure(log);
                 }
             }
 
@@ -104,6 +126,8 @@ public class PollinateIntentService extends IntentService {
                 }
             }
             pollen.cleanup();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } finally {
             pollen.close();
         }

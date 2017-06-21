@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 public class LogClient {
     public static final int CONNECT_TIMEOUT = 15000, READ_TIMEOUT = 60000;
@@ -19,15 +17,6 @@ public class LogClient {
 
     public LogClient(String userAgent) {
         this.userAgent = userAgent;
-    }
-
-    public FutureTask<SignedTreeHead> getSTH(final LogServer log) {
-        return new FutureTask<>(new Callable<SignedTreeHead>() {
-            @Override
-            public SignedTreeHead call() throws Exception {
-                return getSTHSynchronous(log);
-            }
-        });
     }
 
     public SignedTreeHead getSTHSynchronous(LogServer log) throws IOException, JSONException {
