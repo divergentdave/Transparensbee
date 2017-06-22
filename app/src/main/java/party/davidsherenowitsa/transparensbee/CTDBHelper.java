@@ -27,7 +27,7 @@ public class CTDBHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_INDEX_AUDITOR = "CREATE INDEX auditor_index ON " + CTDBContract.Auditor.TABLE_NAME + "(" +
             CTDBContract.Auditor.COLUMN_NAME_DOMAIN + "," +
             CTDBContract.Auditor._ID + ")";
-    private static final String SQL_CREATE_SEEN = "CREATE TABLE " +  CTDBContract.STHSeen.TABLE_NAME + " (" +
+    private static final String SQL_CREATE_SEEN = "CREATE TABLE " + CTDBContract.STHSeen.TABLE_NAME + " (" +
             CTDBContract.STHSeen._ID + " INTEGER PRIMARY KEY," +
             CTDBContract.STHSeen.COLUMN_NAME_STH_ID + " INTEGER," +
             CTDBContract.STHSeen.COLUMN_NAME_AUDITOR_ID + " INTEGER," +

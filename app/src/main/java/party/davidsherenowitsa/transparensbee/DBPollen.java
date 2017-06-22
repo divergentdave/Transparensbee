@@ -44,7 +44,7 @@ public class DBPollen implements Pollen {
 
     @Nullable
     private Long lookupAuditor(AuditorServer auditor) {
-        String[] projection = {CTDBContract.Auditor._ID};
+        String[] projection = {Auditor._ID};
         String predicate = Auditor.COLUMN_NAME_DOMAIN + " = ?";
         String[] predicateArguments = {auditor.getDomain()};
         Cursor cursor = db.query(
@@ -65,11 +65,19 @@ public class DBPollen implements Pollen {
     }
 
     private long lookupOrAddAuditor(AuditorServer auditor) {
-        Long id = lookupAuditor(auditor);
-        if (id != null) {
-            return id;
-        } else {
-            return addAuditor(auditor);
+        db.beginTransaction();
+        try {
+            Long id = lookupAuditor(auditor);
+            if (id != null) {
+                db.setTransactionSuccessful();
+                return id;
+            } else {
+                id = addAuditor(auditor);
+                db.setTransactionSuccessful();
+                return id;
+            }
+        } finally {
+            db.endTransaction();
         }
     }
 
