@@ -23,7 +23,7 @@ public class PollinationSignedTreeHead extends SignedTreeHead {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return super.hashCode() ^ Arrays.hashCode(logID);
     }
 
     @Override
