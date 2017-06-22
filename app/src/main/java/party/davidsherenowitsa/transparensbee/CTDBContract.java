@@ -28,4 +28,12 @@ public final class CTDBContract {
         public static final String COLUMN_NAME_STH_ID = "sth_id";
         public static final String COLUMN_NAME_AUDITOR_ID = "auditor_id";
     }
+
+    public static class ServerStatus implements BaseColumns {
+        public static final String TABLE_NAME = "server_status";
+        public static final String COLUMN_NAME_SERVER_URL = "server_url";
+        public static final String COLUMN_NAME_SUCCESS_COUNT = "success_count";
+        public static final String COLUMN_NAME_FAILURE_COUNT = "failure_count";
+        public static final String COLUMN_NAME_LAST_ERROR = "last_error";
+    }
 }

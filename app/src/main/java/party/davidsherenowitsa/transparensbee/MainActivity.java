@@ -12,13 +12,8 @@ import android.widget.Button;
 import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private InMemoryStatistics statistics;
+    private DBStatistics statistics;
     private StatsArrayAdapter logAdapter, auditorAdapter;
-
-    public MainActivity() {
-        super();
-        statistics = InMemoryStatistics.getInstance();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +22,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button runButton = (Button)findViewById(R.id.runButton);
         if (runButton != null) runButton.setOnClickListener(this);
+
+        statistics = new DBStatistics(this);
 
         logAdapter = new StatsArrayAdapter(this, R.layout.log_list_item, LogServer.CT_LOGS, statistics);
         ListView logListView = (ListView)findViewById(R.id.logListView);
@@ -48,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logAdapter.notifyDataSetInvalidated();
         statistics.unregisterListener(auditorAdapter);
         auditorAdapter.notifyDataSetInvalidated();
+        statistics.close();
     }
 
     @Override

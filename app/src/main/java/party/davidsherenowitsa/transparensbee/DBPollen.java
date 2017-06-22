@@ -45,7 +45,7 @@ public class DBPollen implements Pollen {
     @Nullable
     private Long lookupAuditor(AuditorServer auditor) {
         String[] projection = {Auditor._ID};
-        String predicate = Auditor.COLUMN_NAME_DOMAIN + " = ?";
+        String predicate = Auditor.COLUMN_NAME_DOMAIN + "=?";
         String[] predicateArguments = {auditor.getDomain()};
         Cursor cursor = db.query(
                 Auditor.TABLE_NAME,
@@ -85,7 +85,7 @@ public class DBPollen implements Pollen {
     private Long lookupSth(SignedTreeHead sth) {
         String hex = Base64.encodeToString(sth.getTreeHeadSignature(), Base64.NO_WRAP);
         String[] projection = {STH._ID};
-        String predicate = STH.COLUMN_NAME_TREE_HEAD_SIGNATURE_HEX + " = ?";
+        String predicate = STH.COLUMN_NAME_TREE_HEAD_SIGNATURE_HEX + "=?";
         String[] predicateArguments = {hex};
         Cursor cursor = db.query(
                 STH.TABLE_NAME,
@@ -100,6 +100,7 @@ public class DBPollen implements Pollen {
             cursor.close();
             return id;
         } else {
+            cursor.close();
             return null;
         }
     }

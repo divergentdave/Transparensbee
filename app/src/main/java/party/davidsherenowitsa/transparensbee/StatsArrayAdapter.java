@@ -52,7 +52,7 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
     }
 
     @Override
-    public void notify(Server server) {
+    public void notifyChange() {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

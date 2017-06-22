@@ -10,6 +10,6 @@ public interface Statistics {
     void unregisterListener(StatisticsListener listener);
 
     interface StatisticsListener {
-        void notify(Server server);
+        void notifyChange();
     }
 }

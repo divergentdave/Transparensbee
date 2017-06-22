@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class CTDBHelper extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 1;  // Update this when changing schema
+    public static final int DATABASE_VERSION = 2;  // Update this when changing schema
     public static final String DATABASE_NAME = "STH_Storage.db";
 
     private static final String SQL_CREATE_STH = "CREATE TABLE " + CTDBContract.STH.TABLE_NAME + " (" +
@@ -39,9 +39,19 @@ public class CTDBHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_INDEX_SEEN_2 = "CREATE INDEX seen_index_2 ON " + CTDBContract.STHSeen.TABLE_NAME + "(" +
             CTDBContract.STHSeen.COLUMN_NAME_STH_ID + "," +
             CTDBContract.STHSeen.COLUMN_NAME_AUDITOR_ID + ")";
+    private static final String SQL_CREATE_SERVER_STATUS = "CREATE TABLE " + CTDBContract.ServerStatus.TABLE_NAME + " (" +
+            CTDBContract.ServerStatus._ID + " INTEGER PRIMARY KEY," +
+            CTDBContract.ServerStatus.COLUMN_NAME_SERVER_URL + " TEXT," +
+            CTDBContract.ServerStatus.COLUMN_NAME_SUCCESS_COUNT + " INTEGER," +
+            CTDBContract.ServerStatus.COLUMN_NAME_FAILURE_COUNT + " INTEGER," +
+            CTDBContract.ServerStatus.COLUMN_NAME_LAST_ERROR + " TEXT)";
+    private static final String SQL_CREATE_INDEX_SERVER_STATUS = "CREATE INDEX server_status_index ON " + CTDBContract.ServerStatus.TABLE_NAME + "(" +
+            CTDBContract.ServerStatus.COLUMN_NAME_SERVER_URL + "," +
+            CTDBContract.ServerStatus._ID + ")";
     private static final String SQL_DELETE_STH = "DROP TABLE IF EXISTS " + CTDBContract.STH.TABLE_NAME;
     private static final String SQL_DELETE_AUDITOR = "DROP TABLE IF EXISTS " + CTDBContract.Auditor.TABLE_NAME;
     private static final String SQL_DELETE_SEEN = "DROP TABLE IF EXISTS " + CTDBContract.STHSeen.TABLE_NAME;
+    private static final String SQL_DELETE_SERVER_STATUS = "DROP TABLE IF EXISTS " + CTDBContract.ServerStatus.TABLE_NAME;
 
     public CTDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -56,18 +66,28 @@ public class CTDBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_SEEN);
         db.execSQL(SQL_CREATE_INDEX_SEEN_1);
         db.execSQL(SQL_CREATE_INDEX_SEEN_2);
+        db.execSQL(SQL_CREATE_SERVER_STATUS);
+        db.execSQL(SQL_CREATE_INDEX_SERVER_STATUS);
+    }
+
+    private void deleteTables(SQLiteDatabase db) {
+        db.execSQL(SQL_DELETE_STH);
+        db.execSQL(SQL_DELETE_AUDITOR);
+        db.execSQL(SQL_DELETE_SEEN);
+        db.execSQL(SQL_DELETE_SERVER_STATUS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // I have only written one version so far, nothing to upgrade yet
+        if (oldVersion <= 1) {
+            db.execSQL(SQL_CREATE_SERVER_STATUS);
+            db.execSQL(SQL_CREATE_INDEX_SERVER_STATUS);
+        }
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(SQL_DELETE_STH);
-        db.execSQL(SQL_DELETE_AUDITOR);
-        db.execSQL(SQL_DELETE_SEEN);
+        deleteTables(db);
         onCreate(db);
     }
 }

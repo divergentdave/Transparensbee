@@ -28,11 +28,8 @@ public class PollinateIntentService extends IntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
     private static final String USER_AGENT = "Transparensbee (https://github.com/divergentdave/Transparensbee)";
 
-    private InMemoryStatistics statistics;
-
     public PollinateIntentService() {
         super("PollinateIntentService");
-        statistics = InMemoryStatistics.getInstance();
     }
 
     /**
@@ -62,6 +59,7 @@ public class PollinateIntentService extends IntentService {
      */
     private void handleActionPollinate() {
         DBPollen pollen = new DBPollen(this);
+        final DBStatistics statistics = new DBStatistics(this);
         try {
             BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
             ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(0, 10, 1, TimeUnit.SECONDS, workQueue);
@@ -130,6 +128,7 @@ public class PollinateIntentService extends IntentService {
             Thread.currentThread().interrupt();
         } finally {
             pollen.close();
+            statistics.close();
         }
     }
 }

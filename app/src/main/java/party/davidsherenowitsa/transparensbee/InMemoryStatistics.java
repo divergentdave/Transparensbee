@@ -34,7 +34,7 @@ public class InMemoryStatistics implements Statistics {
         }
         for (StatisticsListener listener : listenerList)
         {
-            listener.notify(server);
+            listener.notifyChange();
         }
     }
 
@@ -48,7 +48,7 @@ public class InMemoryStatistics implements Statistics {
         }
         for (StatisticsListener listener : listenerList)
         {
-            listener.notify(server);
+            listener.notifyChange();
         }
     }
 
