@@ -14,7 +14,7 @@ import java.util.List;
 
 import static party.davidsherenowitsa.transparensbee.CTDBContract.*;
 
-public class DBPollen implements Pollen {
+public class DBPollen {
     private CTDBHelper dbHelper;
     private SQLiteDatabase db;
 
@@ -105,7 +105,6 @@ public class DBPollen implements Pollen {
         }
     }
 
-    @Override
     public void addFromLog(LogServer log, SignedTreeHead sth) {
         if (db == null) {
             open();
@@ -129,7 +128,6 @@ public class DBPollen implements Pollen {
         db.insert(STH.TABLE_NAME, null, values);
     }
 
-    @Override
     public void addFromAuditor(AuditorServer auditor, Collection<PollinationSignedTreeHead> sths) {
         if (db == null) {
             open();
@@ -168,7 +166,6 @@ public class DBPollen implements Pollen {
         }
     }
 
-    @Override
     public Collection<PollinationSignedTreeHead> getForAuditor(AuditorServer auditor) {
         if (db == null) {
             open();

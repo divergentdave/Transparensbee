@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistics.StatisticsListener {
+public class StatsArrayAdapter extends ArrayAdapter<Server> implements StatisticsListener {
     private Activity activity;
     private int viewId;
-    private Statistics statistics;
+    private DBStatistics statistics;
 
-    public StatsArrayAdapter(Activity activity, int id, Server[] array, Statistics statistics) {
+    public StatsArrayAdapter(Activity activity, int id, Server[] array, DBStatistics statistics) {
         super(activity, id, array);
         this.activity = activity;
         this.viewId = id;

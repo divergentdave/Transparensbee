@@ -15,7 +15,7 @@ import java.util.List;
 
 import static party.davidsherenowitsa.transparensbee.CTDBContract.*;
 
-public class DBStatistics extends BroadcastReceiver implements Statistics {
+public class DBStatistics extends BroadcastReceiver {
     private List<StatisticsListener> listenerList;
     private CTDBHelper dbHelper;
     private SQLiteDatabase db;
@@ -72,7 +72,6 @@ public class DBStatistics extends BroadcastReceiver implements Statistics {
         lbm.sendBroadcast(intent);
     }
 
-    @Override
     public void addFailure(Server server) {
         if (db == null) {
             open();
@@ -104,7 +103,6 @@ public class DBStatistics extends BroadcastReceiver implements Statistics {
         notifyChangeAll();
     }
 
-    @Override
     public void addSuccess(Server server) {
         if (db == null) {
             open();
@@ -135,7 +133,6 @@ public class DBStatistics extends BroadcastReceiver implements Statistics {
         notifyChangeAll();
     }
 
-    @Override
     public Pair<Integer, Integer> getServerSuccessFailure(Server server) {
         if (db == null) {
             open();
@@ -162,12 +159,10 @@ public class DBStatistics extends BroadcastReceiver implements Statistics {
         }
     }
 
-    @Override
     public void registerListener(StatisticsListener listener) {
         listenerList.add(listener);
     }
 
-    @Override
     public void unregisterListener(StatisticsListener listener) {
         listenerList.remove(listener);
     }
