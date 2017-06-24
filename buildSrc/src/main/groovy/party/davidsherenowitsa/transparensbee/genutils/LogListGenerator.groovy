@@ -39,6 +39,9 @@ public class LogListGenerator {
         def slurper = new JsonSlurper()
         def result = slurper.parse(listFile)
         for (obj in result.logs) {
+            if (obj.disqualified_at && System.currentTimeSeconds() > obj.disqualified_at) {
+                continue
+            }
             def ctorInvocation = JExpr._new(logServerClass)
             ctorInvocation.arg(obj.url)
             def base64Invocation = base64Class.staticInvoke('decode')
