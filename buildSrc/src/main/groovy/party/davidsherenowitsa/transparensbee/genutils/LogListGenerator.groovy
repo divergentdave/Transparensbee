@@ -1,16 +1,22 @@
 package party.davidsherenowitsa.transparensbee.genutils
 
-import groovy.json.JsonSlurper
-
 import com.sun.codemodel.ClassType
 import com.sun.codemodel.JCodeModel
 import com.sun.codemodel.JExpr
+import groovy.json.JsonSlurper
+import org.bouncycastle.util.io.pem.PemReader
+
+import java.security.KeyFactory
+import java.security.Signature
+import java.security.spec.X509EncodedKeySpec
 
 import static com.sun.codemodel.JMod.*
 
 public class LogListGenerator {
-    private static final URL GOOGLE_LOG_LIST_URL = new URL('https://www.gstatic.com/ct/log_list/log_list.json')
-    private static final URL GOOGLE_LOG_SIG_URL = new URL('https://www.gstatic.com/ct/log_list/log_list.sig')
+    private static
+    final URL GOOGLE_LOG_LIST_URL = new URL('https://www.gstatic.com/ct/log_list/log_list.json')
+    private static
+    final URL GOOGLE_LOG_SIG_URL = new URL('https://www.gstatic.com/ct/log_list/log_list.sig')
 
     public static void downloadLogList(final File resourceDir) {
         def listFile = new File(resourceDir, 'log_list.json').newOutputStream()
@@ -23,8 +29,19 @@ public class LogListGenerator {
     }
 
     public static void generateLogListClass(final File resourceDir, final File outputDir) {
-        def listFile = new File(resourceDir, 'log_list.json')
-        def sigFile = new File(resourceDir, 'log_list.sig')
+        def listBytes = new File(resourceDir, 'log_list.json').getBytes()
+        def sigBytes = new File(resourceDir, 'log_list.sig').getBytes()
+
+        def pemReader = new PemReader(new FileReader(new File(resourceDir, 'log_list_pubkey.pem')))
+        def keySpec = new X509EncodedKeySpec(pemReader.readPemObject().getContent())
+        def keyFactory = KeyFactory.getInstance("RSA")
+        def pubKey = keyFactory.generatePublic(keySpec)
+        def signature = Signature.getInstance("SHA256withRSA")
+        signature.initVerify(pubKey)
+        signature.update(listBytes)
+        if (!signature.verify(sigBytes)) {
+            throw new Exception("The signature for the log_list.json file is invalid")
+        }
 
         def codeModel = new JCodeModel()
 
@@ -37,11 +54,12 @@ public class LogListGenerator {
         def base64Class = codeModel.ref("android.util.Base64")
 
         def slurper = new JsonSlurper()
-        def result = slurper.parse(listFile)
+        def result = slurper.parse(listBytes)
         for (obj in result.logs) {
             if (obj.disqualified_at && System.currentTimeSeconds() > obj.disqualified_at) {
                 continue
             }
+
             def ctorInvocation = JExpr._new(logServerClass)
             ctorInvocation.arg(obj.url)
             def base64Invocation = base64Class.staticInvoke('decode')
