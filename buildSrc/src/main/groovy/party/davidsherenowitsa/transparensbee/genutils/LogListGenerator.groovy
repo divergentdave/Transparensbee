@@ -32,9 +32,9 @@ public class LogListGenerator {
         def logListClass = codeModel._class(PUBLIC | FINAL, fqcn, ClassType.CLASS)
 
         def logServerClass = codeModel.ref('party.davidsherenowitsa.transparensbee.LogServer')
+        def arrayLogServerType = logServerClass.array()
+        def array = JExpr.newArray(logServerClass)
         def base64Class = codeModel.ref("android.util.Base64")
-        def listLogServerType = codeModel.ref(List.class).narrow(logServerClass)
-        def asListInvocation = codeModel.directClass(Arrays.class.getName()).staticInvoke('asList')
 
         def slurper = new JsonSlurper()
         def result = slurper.parse(listFile)
@@ -46,14 +46,10 @@ public class LogListGenerator {
             base64Invocation.arg(base64Class.staticRef('DEFAULT'))
             ctorInvocation.arg(base64Invocation)
             ctorInvocation.arg(obj.description)
-            asListInvocation.arg(ctorInvocation)
+            array.add(ctorInvocation)
         }
 
-        def constant = codeModel
-                .directClass(Collections.class.getName())
-                .staticInvoke('unmodifiableList')
-                .arg(asListInvocation)
-        def field = logListClass.field(PUBLIC | STATIC | FINAL, listLogServerType, 'LOG_LIST', constant)
+        logListClass.field(PUBLIC | STATIC | FINAL, arrayLogServerType, 'CT_LOGS', array)
         logListClass.constructor(PRIVATE)
 
         if (!outputDir.isDirectory() && !outputDir.mkdirs()) {
