@@ -1,0 +1,7 @@
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.sun.codemodel:codemodel:2.6'
+}
