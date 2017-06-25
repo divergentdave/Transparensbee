@@ -24,6 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import party.davidsherenowitsa.transparensbee.genutils.LogList;
+
 public class PollinateIntentService extends IntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
     private static final String USER_AGENT = "Transparensbee (https://github.com/divergentdave/Transparensbee)";
@@ -66,7 +68,7 @@ public class PollinateIntentService extends IntentService {
             CompletionService<Pair<LogServer, SignedTreeHead>> executorCompletionService = new ExecutorCompletionService<>(threadPoolExecutor);
             final LogClient logClient = new LogClient(USER_AGENT);
 
-            for (final LogServer log : LogServer.CT_LOGS) {
+            for (final LogServer log : LogList.CT_LOGS) {
                 executorCompletionService.submit(new Callable<Pair<LogServer, SignedTreeHead>>() {
                     @Override
                     public Pair<LogServer, SignedTreeHead> call() throws Exception {
@@ -89,7 +91,7 @@ public class PollinateIntentService extends IntentService {
             threadPoolExecutor.shutdown();
 
             //noinspection ForLoopReplaceableByForEach
-            for (int i = 0; i < LogServer.CT_LOGS.length; i++) {
+            for (int i = 0; i < LogList.CT_LOGS.length; i++) {
                 try {
                     Pair<LogServer, SignedTreeHead> results = executorCompletionService.take().get();
                     if (results != null) {

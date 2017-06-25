@@ -4,36 +4,38 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
+
+import party.davidsherenowitsa.transparensbee.genutils.LogList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private DBStatistics statistics;
-    private StatsArrayAdapter logAdapter, auditorAdapter;
+    private StatsArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button runButton = (Button)findViewById(R.id.runButton);
+        FloatingActionButton runButton = (FloatingActionButton)findViewById(R.id.runButton);
         if (runButton != null) runButton.setOnClickListener(this);
 
         statistics = new DBStatistics(this);
 
-        logAdapter = new StatsArrayAdapter(this, R.layout.log_list_item, LogServer.CT_LOGS, statistics);
-        ListView logListView = (ListView)findViewById(R.id.logListView);
-        if (logListView != null) logListView.setAdapter(logAdapter);
-        statistics.registerListener(logAdapter);
-
-        auditorAdapter = new StatsArrayAdapter(this, R.layout.auditor_list_item, AuditorServer.AUDITORS, statistics);
-        ListView auditorListView = (ListView)findViewById(R.id.auditorListView);
-        if (auditorListView != null) auditorListView.setAdapter(auditorAdapter);
-        statistics.registerListener(auditorAdapter);
+        adapter = StatsArrayAdapter.factory(this,
+                R.layout.header_list_item,
+                R.layout.server_list_item,
+                LogList.CT_LOGS,
+                AuditorServer.AUDITORS,
+                statistics);
+        ListView listView = (ListView)findViewById(R.id.listView);
+        if (listView != null) listView.setAdapter(adapter);
+        statistics.registerListener(adapter);
 
         setAlarm(this);
     }
@@ -41,10 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStop() {
         super.onStop();
-        statistics.unregisterListener(logAdapter);
-        logAdapter.notifyDataSetInvalidated();
-        statistics.unregisterListener(auditorAdapter);
-        auditorAdapter.notifyDataSetInvalidated();
+        statistics.unregisterListener(adapter);
+        adapter.notifyDataSetInvalidated();
         statistics.close();
     }
 
