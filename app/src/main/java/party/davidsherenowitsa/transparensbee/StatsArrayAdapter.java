@@ -17,7 +17,6 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
     private int viewIdServer;
     private DBStatistics statistics;
     private int logCount;
-    private int auditorCount;
     private String logHeaderText;
     private String auditorHeaderText;
 
@@ -35,8 +34,7 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
                 viewIdServer,
                 array,
                 statistics,
-                logServers.length,
-                auditorServers.length);
+                logServers.length);
     }
 
     private StatsArrayAdapter(Activity activity,
@@ -44,15 +42,13 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
                               int viewIdServer,
                               Server[] array,
                               DBStatistics statistics,
-                              int logCount,
-                              int auditorCount) {
+                              int logCount) {
         super(activity, 0, array);
         this.activity = activity;
         this.layoutIdHeader = viewIdHeader;
         this.viewIdServer = viewIdServer;
         this.statistics = statistics;
         this.logCount = logCount;
-        this.auditorCount = auditorCount;
     }
 
     @Override
@@ -91,24 +87,19 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
                     failureTextView = convertView.findViewById(R.id.listItemFailure);
             if (nameTextView != null && successTextView != null && failureTextView != null) {
                 Server server = getItem(position);
-                if (server != null) {
-                    nameTextView.setText(server.getHumanReadableName());
-                    Pair<Integer, Integer> pair = statistics.getServerSuccessFailure(server);
-                    int success, failure;
-                    if (pair != null) {
-                        success = pair.first;
-                        failure = pair.second;
-                    } else {
-                        success = 0;
-                        failure = 0;
-                    }
-                    successTextView.setText(activity.getString(R.string.list_item_success, success));
-                    failureTextView.setText(activity.getString(R.string.list_item_failure, failure));
+                assert server != null;
+                nameTextView.setText(server.getHumanReadableName());
+                Pair<Integer, Integer> pair = statistics.getServerSuccessFailure(server);
+                int success, failure;
+                if (pair != null) {
+                    success = pair.first;
+                    failure = pair.second;
                 } else {
-                    nameTextView.setText("this is a header");
-                    successTextView.setText("");
-                    failureTextView.setText("");
+                    success = 0;
+                    failure = 0;
                 }
+                successTextView.setText(activity.getString(R.string.list_item_success, success));
+                failureTextView.setText(activity.getString(R.string.list_item_failure, failure));
             }
         }
         return convertView;
@@ -131,11 +122,7 @@ public class StatsArrayAdapter extends ArrayAdapter<Server> implements Statistic
 
     @Override
     public boolean isEnabled(int position) {
-        if (position == 0 || position == logCount + 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(position == 0 || position == logCount + 1);
     }
 
     @Override
