@@ -7,7 +7,7 @@
         <domain includeSubdomains="true">org</domain>
         <domain includeSubdomains="true">io</domain>
         <domain-config>
-            <domain includeSubdomains="true">ct.grahamedgecombe.com</domain>
+            <domain includeSubdomains="false">ct.grahamedgecombe.com</domain>
             <pin-set expiration="2017-06-13">
                 <pin digest="SHA-256">JgsfHZPAOW2WPM4/hyZEfyozJWGUd8EKfTfuO51tyTk=</pin>
                 <pin digest="SHA-256">K4GUUPiNpr3HphtlHVXwcJ/0e3mCG8REvCFIKsVmAT8=</pin>
@@ -16,6 +16,12 @@
                 <pin digest="SHA-256">culrj4H8J1foar4saQWUD5TjPk8HihAxpO/maA9uqZU=</pin>
                 <pin digest="SHA-256">287zGo/tCnBFamKDRvwOKFEu8+clWFHjL4DfPEEWRZs=</pin>
             </pin-set>
+        </domain-config>
+        <domain-config>
+            <domain includeSubdomains="false">ctserver.cnnic.cn</domain>
+            <trust-anchors>
+                <certificates src="@raw/cnnic" />
+            </trust-anchors>
         </domain-config>
     </domain-config>
 </network-security-config>
