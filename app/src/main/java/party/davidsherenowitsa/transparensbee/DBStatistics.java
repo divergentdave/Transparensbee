@@ -28,19 +28,17 @@ public class DBStatistics extends BroadcastReceiver {
         dbHelper = new CTDBHelper(context);
         db = null;
         lbm = LocalBroadcastManager.getInstance(context);
+    }
+
+    public void open() {
+        db = dbHelper.getWritableDatabase();
         IntentFilter intentFilter = new IntentFilter(STATS_UPDATE_ACTION);
         lbm.registerReceiver(this, intentFilter);
     }
 
-    private void open() {
-        if (db != null) {
-            db.close();
-        }
-        db = dbHelper.getWritableDatabase();
-    }
-
     public void close() {
         dbHelper.close();
+        db = null;
         lbm.unregisterReceiver(this);
     }
 
@@ -73,9 +71,6 @@ public class DBStatistics extends BroadcastReceiver {
     }
 
     public void addFailure(Server server) {
-        if (db == null) {
-            open();
-        }
         String url = urlForServer(server);
         db.beginTransaction();
         try {
@@ -104,9 +99,6 @@ public class DBStatistics extends BroadcastReceiver {
     }
 
     public void addSuccess(Server server) {
-        if (db == null) {
-            open();
-        }
         String url = urlForServer(server);
         db.beginTransaction();
         try {
@@ -134,9 +126,6 @@ public class DBStatistics extends BroadcastReceiver {
     }
 
     public Pair<Integer, Integer> getServerSuccessFailure(Server server) {
-        if (db == null) {
-            open();
-        }
         Cursor cursor = db.query(
                 ServerStatus.TABLE_NAME,
                 new String[]{

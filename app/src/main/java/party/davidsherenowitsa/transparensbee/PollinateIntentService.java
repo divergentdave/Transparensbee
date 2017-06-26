@@ -62,6 +62,7 @@ public class PollinateIntentService extends IntentService {
     private void handleActionPollinate() {
         DBPollen pollen = new DBPollen(this);
         final DBStatistics statistics = new DBStatistics(this);
+        statistics.open();
         try {
             BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
             ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(0, 10, 1, TimeUnit.SECONDS, workQueue);

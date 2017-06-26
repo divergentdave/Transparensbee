@@ -35,9 +35,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 statistics);
         ListView listView = (ListView)findViewById(R.id.listView);
         if (listView != null) listView.setAdapter(adapter);
-        statistics.registerListener(adapter);
 
         setAlarm(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        statistics.open();
+        statistics.registerListener(adapter);
     }
 
     @Override
