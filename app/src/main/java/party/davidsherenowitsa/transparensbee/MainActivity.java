@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton runButton = (FloatingActionButton)findViewById(R.id.runButton);
+        FloatingActionButton runButton = findViewById(R.id.runButton);
         if (runButton != null) runButton.setOnClickListener(this);
 
         statistics = new DBStatistics(this);
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 LogList.CT_LOGS,
                 AuditorServer.AUDITORS,
                 statistics);
-        ListView listView = (ListView)findViewById(R.id.listView);
+        ListView listView = findViewById(R.id.listView);
         if (listView != null) listView.setAdapter(adapter);
 
         setAlarm(this);
