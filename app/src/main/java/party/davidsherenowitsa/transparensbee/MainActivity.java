@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId())
         {
             case R.id.runButton:
-                PollinateIntentService.startActionFoo(this);
+                PollinateJobIntentService.startActionPollinate(this);
                 break;
         }
     }

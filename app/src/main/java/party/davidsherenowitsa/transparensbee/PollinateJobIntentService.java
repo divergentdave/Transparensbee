@@ -1,8 +1,9 @@
 package party.davidsherenowitsa.transparensbee;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 import android.util.Pair;
 
 import org.json.JSONException;
@@ -26,33 +27,24 @@ import java.util.concurrent.TimeUnit;
 
 import party.davidsherenowitsa.transparensbee.genutils.LogList;
 
-public class PollinateIntentService extends IntentService {
+public class PollinateJobIntentService extends JobIntentService {
     private static final String ACTION_POLLINATE = "party.davidsherenowitsa.transparensbee.action.POLLINATE";
+    private static final int JOB_ID_POLLINATE = 0;
     private static final String USER_AGENT = "Transparensbee (https://github.com/divergentdave/Transparensbee)";
 
-    public PollinateIntentService() {
-        super("PollinateIntentService");
-    }
+    private static boolean stop = false;
 
-    /**
-     * Starts this service to perform action Pollinate. If the service is
-     * already performing a task, this action will be queued.
-     *
-     * @see IntentService
-     */
-    public static void startActionFoo(Context context) {
-        Intent intent = new Intent(context, PollinateIntentService.class);
+    public static void startActionPollinate(Context context) {
+        Intent intent = new Intent(context, PollinateJobIntentService.class);
         intent.setAction(ACTION_POLLINATE);
-        context.startService(intent);
+        enqueueWork(context, PollinateJobIntentService.class, JOB_ID_POLLINATE, intent);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_POLLINATE.equals(action)) {
-                handleActionPollinate();
-            }
+    protected void onHandleWork(@NonNull Intent intent) {
+        final String action = intent.getAction();
+        if (ACTION_POLLINATE.equals(action)) {
+            handleActionPollinate();
         }
     }
 
@@ -60,6 +52,7 @@ public class PollinateIntentService extends IntentService {
      * Handle action Pollinate in the provided background thread.
      */
     private void handleActionPollinate() {
+        stop = false;
         DBPollen pollen = new DBPollen(this);
         final DBStatistics statistics = new DBStatistics(this);
         statistics.open();
@@ -104,6 +97,10 @@ public class PollinateIntentService extends IntentService {
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
+                if (stop) {
+                    threadPoolExecutor.shutdownNow();
+                    break;
+                }
             }
 
             AuditorClient auditorClient = new AuditorClient(USER_AGENT);
@@ -125,6 +122,9 @@ public class PollinateIntentService extends IntentService {
                     e.printStackTrace();
                     statistics.addFailure(auditor);
                 }
+                if (stop) {
+                    break;
+                }
             }
             pollen.cleanup();
         } catch (InterruptedException e) {
@@ -133,5 +133,11 @@ public class PollinateIntentService extends IntentService {
             pollen.close();
             statistics.close();
         }
+    }
+
+    @Override
+    public boolean onStopCurrentWork() {
+        stop = true;
+        return true;
     }
 }
