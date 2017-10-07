@@ -253,6 +253,9 @@ public class DBPollen {
     }
 
     public void cleanup() {
+        if (db == null) {
+            open();
+        }
         List<Long> ids = new ArrayList<>();
         long timestampCutoff = System.currentTimeMillis() - TWO_WEEKS;
         String[] projection = {STH._ID};
