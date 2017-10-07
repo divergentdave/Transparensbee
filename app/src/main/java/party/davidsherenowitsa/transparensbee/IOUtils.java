@@ -8,13 +8,16 @@ import java.io.Reader;
 public class IOUtils {
     public static String slurpInputStreamUTF8(InputStream is) throws IOException {
         Reader reader = new InputStreamReader(is, "UTF-8");
-        StringBuilder result = new StringBuilder();
-        char[] buf = new char[1024];
-        int read;
-        while ((read = reader.read(buf)) != -1)
-        {
-            result.append(buf, 0, read);
+        try {
+            StringBuilder result = new StringBuilder();
+            char[] buf = new char[1024];
+            int read;
+            while ((read = reader.read(buf)) != -1) {
+                result.append(buf, 0, read);
+            }
+            return result.toString();
+        } finally {
+            reader.close();
         }
-        return result.toString();
     }
 }

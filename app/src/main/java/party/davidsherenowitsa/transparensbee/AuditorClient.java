@@ -34,12 +34,17 @@ public class AuditorClient {
         conn.setReadTimeout(READ_TIMEOUT);
         conn.setDoOutput(true);
         OutputStream os = conn.getOutputStream();
-        serializeSTHList(os, sths);
-        os.close();
+        try {
+            serializeSTHList(os, sths);
+        } finally {
+            os.close();
+        }
         InputStream is = conn.getInputStream();
-        List<PollinationSignedTreeHead> newSths = parseSTHList(is);
-        is.close();
-        return newSths;
+        try {
+            return parseSTHList(is);
+        } finally {
+            is.close();
+        }
     }
 
     public void serializeSTHList(OutputStream os, Collection<PollinationSignedTreeHead> sths) throws IOException, JSONException {
@@ -58,8 +63,12 @@ public class AuditorClient {
         top.put("sths", array);
         String string = top.toString();
         Writer writer = new OutputStreamWriter(os);
-        writer.write(string);
-        writer.flush();
+        try {
+            writer.write(string);
+            writer.flush();
+        } finally {
+            writer.close();
+        }
     }
 
     public List<PollinationSignedTreeHead> parseSTHList(InputStream is) throws IOException, JSONException {
