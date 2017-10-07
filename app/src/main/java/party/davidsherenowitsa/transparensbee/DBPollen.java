@@ -60,6 +60,7 @@ public class DBPollen {
             cursor.close();
             return id;
         } else {
+            cursor.close();
             return null;
         }
     }
