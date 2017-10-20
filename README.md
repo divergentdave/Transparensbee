@@ -22,11 +22,17 @@ Transparensbee is primarily developed in Android Studio. To build it outside of
 an IDE environment, use Gradle, as follows:
 
 ```bash
+./gradlew downloadLogList
 ./gradlew assembleDebug
 ```
 
 or, on Windows:
 
 ```batch
+gradlew.bat downloadLogList
 gradlew.bat assembleDebug
 ```
+
+Rerun the `downloadLogList` task every few months to update the list of CT
+logs that are bundled into the app. The list is obtained from
+https://www.certificate-transparency.org/known-logs.
