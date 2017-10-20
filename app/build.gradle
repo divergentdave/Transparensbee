@@ -5,14 +5,19 @@ apply plugin: 'com.android.application'
 def generatedSrcDir = new File(buildDir, "generated/logs/src/main/java")
 def resourceDir = new File(projectDir, "../buildSrc/src/main/resources/party/davidsherenowitsa/transparensbee/genutils")
 
-task generateLogListClass << {
-    LogListGenerator.generateLogListClass(resourceDir, generatedSrcDir)
+task generateLogListClass {
+    doLast {
+        LogListGenerator.generateLogListClass(resourceDir, generatedSrcDir)
+    }
 }
 
 preBuild.dependsOn generateLogListClass
 
-task downloadLogList << {
-    LogListGenerator.downloadLogList(resourceDir)
+task downloadLogList {
+    doLast
+    {
+        LogListGenerator.downloadLogList(resourceDir)
+    }
 }
 
 android {
