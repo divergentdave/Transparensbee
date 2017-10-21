@@ -40,16 +40,27 @@ public class CryptoUtils {
         byteBuffer.put(signedTreeHead.getRootHash());
 
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(logServer.getPublicKey());
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        PublicKey publicKey = keyFactory.generatePublic(keySpec);
-
         byte[] signatureBytes = signedTreeHead.getTreeHeadSignature();
         if (signatureBytes[0] != 4) {
             // HashAlgorithm of sha256
             return false;
         }
-        if (signatureBytes[1] != 3) {
+        Signature signature;
+        KeyFactory keyFactory;
+        PublicKey publicKey;
+        if (signatureBytes[1] == 1) {
+            // SignatureAlgorithm of rsa
+            signature = Signature.getInstance("SHA256withRSA");
+
+            keyFactory = KeyFactory.getInstance("RSA");
+            publicKey = keyFactory.generatePublic(keySpec);
+        } else if (signatureBytes[1] == 3) {
             // SignatureAlgorithm of ecdsa
+            signature = Signature.getInstance("SHA256withECDSA");
+
+            keyFactory = KeyFactory.getInstance("EC");
+            publicKey = keyFactory.generatePublic(keySpec);
+        } else {
             return false;
         }
         int signatureLength = signatureBytes[2] << 8 | signatureBytes[3];
@@ -58,7 +69,6 @@ public class CryptoUtils {
             return false;
         }
 
-        Signature signature = Signature.getInstance("SHA256withECDSA");
         signature.initVerify(publicKey);
         signature.update(treeHeadData);
         return signature.verify(signatureBytes, 4, signatureBytes.length - 4);
