@@ -3,8 +3,8 @@ package party.davidsherenowitsa.transparensbee;
 import java.util.Arrays;
 
 public class SignedTreeHead {
-    private final int version;
-    private final int signatureType;
+    private final byte version;
+    private final byte signatureType;
     private final long timestamp;
     private final long treeSize;
     private final byte[] rootHash;
@@ -20,12 +20,12 @@ public class SignedTreeHead {
         this.treeHeadSignature = treeHeadSignature;
     }
 
-    public int getVersion()
+    public byte getVersion()
     {
         return version;
     }
 
-    public int getSignatureType()
+    public byte getSignatureType()
     {
         return signatureType;
     }
