@@ -67,7 +67,13 @@ public class PollinateJobIntentService extends JobIntentService {
                     @Override
                     public Pair<LogServer, SignedTreeHead> call() throws Exception {
                         try {
-                            return new Pair<>(log, logClient.getSTHSynchronous(log));
+                            SignedTreeHead sth = logClient.getSTHSynchronous(log);
+                            if (CryptoUtils.isSTHValid(sth, log)) {
+                                return new Pair<>(log, sth);
+                            } else {
+                                statistics.addFailure(log);
+                                return null;
+                            }
                         } catch (SocketTimeoutException e) {
                             statistics.addFailure(log);
                             return null;
