@@ -3,6 +3,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.sun.codemodel:codemodel:2.6'
-    compile 'org.bouncycastle:bcprov-ext-jdk15on:1.57'
+    implementation 'com.sun.codemodel:codemodel:2.6'
+    implementation 'org.bouncycastle:bcprov-ext-jdk15on:1.57'
 }
