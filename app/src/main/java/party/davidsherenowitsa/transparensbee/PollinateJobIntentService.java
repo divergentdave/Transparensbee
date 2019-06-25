@@ -2,8 +2,8 @@ package party.davidsherenowitsa.transparensbee;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
 import android.util.Pair;
 
 import org.json.JSONException;
@@ -90,7 +90,6 @@ public class PollinateJobIntentService extends JobIntentService {
             }
             threadPoolExecutor.shutdown();
 
-            //noinspection ForLoopReplaceableByForEach
             for (int i = 0; i < LogList.CT_LOGS.length; i++) {
                 try {
                     Pair<LogServer, SignedTreeHead> results = executorCompletionService.take().get();

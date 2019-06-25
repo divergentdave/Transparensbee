@@ -1,6 +1,6 @@
 package party.davidsherenowitsa.transparensbee;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 import android.util.Base64;
 
 import org.junit.Test;
